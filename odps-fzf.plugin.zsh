@@ -26,10 +26,10 @@ function ofields() {
     [ $? -eq 0 ] && odesc $args | sed -e '1,/Field/d' -e '/+/d' | tr '|' ' ' | trim | grep .
 }
 function odownload() {
+    postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
     table=`otable` \
-        && fields=`ofields $table | fzf --header='Fields to download:' | awk '{print $1}' 2>/dev/null` \
-        && postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv) \
+        && fields=(`ofields $table | fzf --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
         && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose a postfix:'` \
         && threads=`seq 1 16 | fzf --header='Threads count:'` \
-        && odpscmd -e "tunnel download ${table} ${table}${postfix} -cn ${fields} -threads ${threads}"
+        && odpscmd -e "tunnel download ${table} ${table}${postfix} -cn ${(j:,:)fields} -threads ${threads}"
 }
