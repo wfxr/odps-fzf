@@ -23,7 +23,7 @@ function ocount() {
 }
 function ofields() {
     [ $# -gt 0 ] && args=$@ || args=`otable`
-    [ $? -eq 0 ] && odesc $args | sed -e '1,/Field/d' -e '/+/d' | tr '|' ' ' | grep .
+    [ $? -eq 0 ] && odesc $args | sed -e '1,/Field/d' -e '/+/d' | tr '|' ' ' | trim | grep .
 }
 function odownload() {
     table=`otable` \
