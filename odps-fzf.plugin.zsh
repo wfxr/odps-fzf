@@ -10,30 +10,26 @@ function otable() {
     ([ -f ~/.odps-tables ] || oupdate) && fzf < ~/.odps-tables
 }
 function opeek() {
-    [ $# -eq 0 ] && args=`otable` || args=$@
-    ocmd 'select * from {} limit 10' $args
+    [ $# -gt 0 ] && args=$@ || args=`otable`
+    [ $? -eq 0 ] && ocmd 'select * from {} limit 10' $args
 }
 function odesc() {
-    [ $# -eq 0 ] && args=`otable` || args=$@
-    ocmd "desc {}" $args
+    [ $# -gt 0 ] && args=$@ || args=`otable`
+    [ $? -eq 0 ] && ocmd "desc {}" $args
 }
 function ocount() {
-    [ $# -eq 0 ] && args=`otable` || args=$@
-    ocmd 'count {}' $args
+    [ $# -gt 0 ] && args=$@ || args=`otable`
+    [ $? -eq 0 ] && ocmd 'count {}' $args
 }
 function ofields() {
-    [ $# -eq 0 ] && args=`otable` || args=$@
-    odesc $args | sed -e '1,/Field/d' -e '/+/d' | tr '|' ' ' | grep .
+    [ $# -gt 0 ] && args=$@ || args=`otable`
+    [ $? -eq 0 ] && odesc $args | sed -e '1,/Field/d' -e '/+/d' | tr '|' ' ' | grep .
 }
 function odownload() {
-    table=`otable`
-    [ $? -ne 0 ] && return -1
-    fields=`ofields $table | fzf --header='Fields to download:' | awk '{print $1}' 2>/dev/null`
-    [ $? -ne 0 ] && return -1
-    postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
-    postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose a postfix:'`
-    [ $? -ne 0 ] && return -1
-    threads=`seq 1 16 | fzf --header='Threads count:'`
-    [ $? -ne 0 ] && return -1
-    odpscmd -e "tunnel download ${table} ${table}${postfix} -cn ${fields} -threads ${threads}"
+    table=`otable` \
+        && fields=`ofields $table | fzf --header='Fields to download:' | awk '{print $1}' 2>/dev/null` \
+        && postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv) \
+        && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose a postfix:'` \
+        && threads=`seq 1 16 | fzf --header='Threads count:'` \
+        && odpscmd -e "tunnel download ${table} ${table}${postfix} -cn ${fields} -threads ${threads}"
 }
