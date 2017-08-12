@@ -7,11 +7,11 @@ function oupdate() {
     ocmd 'show tables' | grep . | cut -d : -f 2 > ~/.odps-tables
 }
 function otable() {
-    ([ -f ~/.odps-tables ] || oupdate) && fzf < ~/.odps-tables
+    ([ -f ~/.odps-tables ] || oupdate) && fzf --header="Select table:" < ~/.odps-tables
 }
 function opartition() {
     [ $# -gt 0 ] && tb=$@ || tb=`otable`
-    [ $? -eq 0 ] && ocmd 'show partitions {}' $tb | sed "s/=\(.*\)/='\1'/g" | fzf
+    [ $? -eq 0 ] && ocmd 'show partitions {}' $tb | sed "s/=\(.*\)/='\1'/g" | grep . | fzf --tac --header="Select partition:"
 }
 
 function otdesc() {
@@ -63,4 +63,14 @@ function odownload() {
         && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose a postfix:'` \
         && threads=`seq 1 16 | fzf --header='Threads count:'` \
         && odpscmd -e "tunnel download ${table} ${table}${postfix} -cn ${(j:,:)fields} -threads ${threads}"
+}
+function opdownload() {
+    postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
+    table=`otable` \
+        && partition=`opartition $table` \
+        && fields=(`ofields $table | fzf --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
+        && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose a postfix:'` \
+        && threads=`seq 1 16 | fzf --header='Threads count:'` \
+        && echo "tunnel download ${table}/$partition ${table}${postfix} -cn ${(j:,:)fields} -threads ${threads}" \
+        && odpscmd -e "tunnel download ${table}/$partition ${table}${postfix} -cn ${(j:,:)fields} -threads ${threads}"
 }
