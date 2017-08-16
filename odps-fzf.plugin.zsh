@@ -56,7 +56,7 @@ function ofields() {
     [ $# -gt 0 ] && tb=$@ || tb=`otable`
     [ $? -eq 0 ] && otdesc $tb | sed -e '1,/Field/d' -e '/+/d' | tr '|' ' ' | trim | grep .
 }
-function odownload() {
+function otdownload() {
     postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
     table=`otable` \
         && fields=(`ofields $table | fzf -m --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
