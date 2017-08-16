@@ -59,7 +59,7 @@ function ofields() {
 function odownload() {
     postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
     table=`otable` \
-        && fields=(`ofields $table | fzf --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
+        && fields=(`ofields $table | fzf -m --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
         && filename=`echo $table | fzf --header='Choose file name:' --print-query \
                 | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` && [[ -n $filename ]] \
         && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose file postfix:' --print-query \
@@ -72,7 +72,7 @@ function opdownload() {
     postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
     table=`otable` \
         && partition=`opartition $table` \
-        && fields=(`ofields $table | fzf --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
+        && fields=(`ofields $table | fzf -m --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
         && filename=`echo $table | fzf --header='Choose file name:' --print-query \
                 | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` && [[ -n $filename ]] \
         && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose file postfix:' --print-query \
