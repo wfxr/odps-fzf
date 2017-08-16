@@ -61,9 +61,9 @@ function odownload() {
     table=`otable` \
         && fields=(`ofields $table | fzf --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
         && filename=`echo $table | fzf --header='Choose file name:' --print-query \
-                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
+                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` && [[ -n $filename ]] \
         && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose file postfix:' --print-query \
-                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
+                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` && [[ -n $postfix ]] \
         && threads=`seq 1 16 | fzf --header='Select threads count:'` \
         && cmd="tunnel download $table $filename$postfix -cn ${(j:,:)fields} -threads $threads" \
         && odpscmd -e "$cmd"
@@ -74,9 +74,9 @@ function opdownload() {
         && partition=`opartition $table` \
         && fields=(`ofields $table | fzf --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
         && filename=`echo $table | fzf --header='Choose file name:' --print-query \
-                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
+                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` && [[ -n $filename ]] \
         && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose file postfix:' --print-query \
-                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
+                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` && [[ -n $postfix ]] \
         && threads=`seq 1 16 | fzf --header='Select threads count:'` \
         && cmd="tunnel download $table/$partition $filename$postfix -cn ${(j:,:)fields} -threads $threads" \
         && odpscmd -e "$cmd"
