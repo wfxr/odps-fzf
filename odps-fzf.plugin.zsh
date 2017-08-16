@@ -60,17 +60,24 @@ function odownload() {
     postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
     table=`otable` \
         && fields=(`ofields $table | fzf --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
-        && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose a postfix:'` \
-        && threads=`seq 1 16 | fzf --header='Threads count:'` \
-        && odpscmd -e "tunnel download ${table} ${table}${postfix} -cn ${(j:,:)fields} -threads ${threads}"
+        && filename=`echo $table | fzf --header='Choose file name:' --print-query \
+                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
+        && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose file postfix:' --print-query \
+                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
+        && threads=`seq 1 16 | fzf --header='Select threads count:'` \
+        && cmd="tunnel download $table $filename$postfix -cn ${(j:,:)fields} -threads $threads" \
+        && odpscmd -e "$cmd"
 }
 function opdownload() {
     postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
     table=`otable` \
         && partition=`opartition $table` \
         && fields=(`ofields $table | fzf --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
-        && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose a postfix:'` \
-        && threads=`seq 1 16 | fzf --header='Threads count:'` \
-        && echo "tunnel download ${table}/$partition ${table}${postfix} -cn ${(j:,:)fields} -threads ${threads}" \
-        && odpscmd -e "tunnel download ${table}/$partition ${table}${postfix} -cn ${(j:,:)fields} -threads ${threads}"
+        && filename=`echo $table | fzf --header='Choose file name:' --print-query \
+                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
+        && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose file postfix:' --print-query \
+                | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
+        && threads=`seq 1 16 | fzf --header='Select threads count:'` \
+        && cmd="tunnel download $table/$partition $filename$postfix -cn ${(j:,:)fields} -threads $threads" \
+        && odpscmd -e "$cmd"
 }
