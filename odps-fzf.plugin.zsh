@@ -7,11 +7,11 @@ function oupdate() {
     ocmd 'show tables' | grep . | cut -d : -f 2 > ~/.odps-tables
 }
 function otable() {
-    ([ -f ~/.odps-tables ] || oupdate) && fzf --header="Select table:" < ~/.odps-tables
+    ([ -f ~/.odps-tables ] || oupdate) && fzf --prompt="Table: " < ~/.odps-tables
 }
 function opartition() {
     [ $# -gt 0 ] && tb=$@ || tb=`otable`
-    [ $? -eq 0 ] && ocmd 'show partitions {}' $tb | sed "s/=\(.*\)/='\1'/g" | grep . | fzf --tac --header="Select partition:"
+    [ $? -eq 0 ] && ocmd 'show partitions {}' $tb | sed "s/=\(.*\)/='\1'/g" | grep . | fzf --tac --prompt="Partition: "
 }
 
 function otdesc() {
@@ -59,12 +59,12 @@ function ofields() {
 function otdownload() {
     postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
     table=`otable` \
-        && fields=(`ofields $table | fzf -m --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
-        && filename=`echo $table | fzf --header='Choose file name:' --print-query \
+        && fields=(`ofields $table | fzf -m --prompt='Fields: ' | awk '{print $1}'`) && [ ! -z "$fields" ] \
+        && filename=`echo $table | fzf --prompt='Filename: ' --print-query \
                 | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` && [[ -n $filename ]] \
-        && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose file postfix:' --print-query \
+        && postfix=`echo ${(j:\n:)postfix_list} | fzf --prompt='Postfix: ' --print-query \
                 | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
-        && threads=`seq 1 16 | fzf --header='Select threads count:'` \
+        && threads=`seq 1 16 | fzf --prompt='Threads: '` \
         && cmd="tunnel download $table $filename$postfix -cn ${(j:,:)fields} -threads $threads" \
         && odpscmd -e "$cmd"
 }
@@ -72,12 +72,12 @@ function opdownload() {
     postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
     table=`otable` \
         && partition=`opartition $table` \
-        && fields=(`ofields $table | fzf -m --header='Fields to download:' | awk '{print $1}'`) && [ ! -z "$fields" ] \
-        && filename=`echo $table | fzf --header='Choose file name:' --print-query \
+        && fields=(`ofields $table | fzf -m --prompt='Fields: ' | awk '{print $1}'`) && [ ! -z "$fields" ] \
+        && filename=`echo $table | fzf --prompt='Filename: ' --print-query \
                 | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` && [[ -n $filename ]] \
-        && postfix=`echo ${(j:\n:)postfix_list} | fzf --header='Choose file postfix:' --print-query \
+        && postfix=`echo ${(j:\n:)postfix_list} | fzf --prompt='Postfix: ' --print-query \
                 | awk '$0~/^:/ || NR==2 {print $0}' | head -1 | sed 's/^://'` \
-        && threads=`seq 1 16 | fzf --header='Select threads count:'` \
+        && threads=`seq 1 16 | fzf --prompt='Threads: '` \
         && cmd="tunnel download $table/$partition $filename$postfix -cn ${(j:,:)fields} -threads $threads" \
         && odpscmd -e "$cmd"
 }
