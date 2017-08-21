@@ -1,3 +1,6 @@
+ltrim()    { sed 's/^\s\+//g' }
+rtrim()    { sed 's/\s\+$//g' }
+trim()     { ltrim | rtrim    }
 function ocmd() {
     [ $# -lt 1 ] && return 1
     [ $# -gt 1 ] && args=${@:2} || tb='{}'
@@ -54,7 +57,7 @@ function otpeek() {
 }
 function ofields() {
     [ $# -gt 0 ] && tb=$@ || tb=`otable`
-    [ $? -eq 0 ] && otdesc $tb | sed -e '1,/Field/d' -e '/+/d' | tr '|' ' ' | trim | grep .
+    [ $? -eq 0 ] && otdesc $tb | sed -e '1,/Field/d' -e '/+/d' | tr '|' ' ' | trim | sed -n '/Partition Columns/q;p' | grep .
 }
 function otdownload() {
     postfix_list=(.`date +%F` .`date +%F.%T` .`date +%s` .txt .data .dat .csv)
