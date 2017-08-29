@@ -3,8 +3,10 @@ rtrim()    { sed 's/\s\+$//g' }
 trim()     { ltrim | rtrim    }
 function ocmd() {
     [ $# -lt 1 ] && return 1
+    cmd="odpscmd -e \"$1\" 2>/tmp/ocmd.stderr | grep . && echo"
+    [ $# -eq 1 ] && sh -c $cmd return 0
     [ $# -gt 1 ] && args=${@:2} || tb='{}'
-    echo "$args" | sed "s/'/\\\'/g" | xargs -i{} sh -c "odpscmd -e \"$1\" 2>/tmp/ocmd.stderr | grep . && echo"
+    echo "$args" | sed "s/'/\\\'/g" | xargs -i{} sh -c $cmd
 }
 function oupdate() {
     ocmd 'show tables' | grep . | cut -d : -f 2 > ~/.odps-tables
