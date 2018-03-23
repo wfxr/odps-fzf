@@ -55,7 +55,7 @@ function opsize() {
 
 function otpeek() {
     [ $# -gt 0 ] && tb=$@ || tb=`otable`
-    [ $? -eq 0 ] && ocmd 'select * from {} limit 10' $tb
+    [ $? -eq 0 ] && ocmd 'read {} 10' $tb
 }
 function ofields() {
     [ $# -gt 0 ] && tb=$@ || tb=`otable`
